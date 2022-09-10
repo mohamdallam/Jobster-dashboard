@@ -9,7 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Logo from "./components/Logo";
-import { Landing, Error, Register } from "./Pages";
+import { Landing, Error, Register, ProtectedRoute } from "./Pages";
 
 import {
   Profile,
@@ -24,7 +24,14 @@ const App = () => {
     <BrowserRouter>
       {/* <Logo /> */}
       <Routes>
-        <Route path="/" element={<SharedLayout />}>
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <SharedLayout />
+            </ProtectedRoute>
+          }
+        >
           ///////////////////////////////////////////
           <Route index element={<Stats />} />
           <Route path="all-jobs" element={<AllJobs />} />
