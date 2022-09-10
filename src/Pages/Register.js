@@ -4,6 +4,7 @@ import { Logo, FormRow } from "../components";
 import Wrapper from "../assets/wrappers/RegisterPage";
 
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser, registerUser } from "../features/user/userSlice";
@@ -20,6 +21,8 @@ const Register = () => {
 
   const { user, isLoading } = useSelector((store) => store.user);
   const dispatch = useDispatch();
+
+  const navigate = useNavigate();
 
   // ! Handle Change  /////////////////
   const handleChange = (e) => {
@@ -48,6 +51,17 @@ const Register = () => {
   const toggleMember = () => {
     setValues({ ...values, isMember: !values.isMember });
   };
+
+  // ! Navigate To Home Page
+  useEffect(() => {
+    if (user) {
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
+    }
+  }, [user]);
+
+  //////////////////////////////////////////////////////////////
 
   return (
     <Wrapper className="full-page">
