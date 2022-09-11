@@ -1,6 +1,13 @@
 import { toast } from "react-toastify";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+
 import customFetch from "../../utils/axios";
+
+import {
+  registerUserThunk,
+  loginUserThunk,
+  updateUserThunk,
+} from "./userThunk";
 
 import {
   addUserToLocalStorage,
@@ -18,12 +25,14 @@ const initialState = {
 export const registerUser = createAsyncThunk(
   "user/registerUser",
   async (user, thunkAPI) => {
-    try {
-      const resp = await customFetch.post("/auth/register", user);
-      return resp.data;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data.msg);
-    }
+    return registerUserThunk("/auth/register", user, thunkAPI);
+
+    // try {
+    //   const resp = await customFetch.post("/auth/register", user);
+    //   return resp.data;
+    // } catch (error) {
+    //   return thunkAPI.rejectWithValue(error.response.data.msg);
+    // }
   }
 );
 
@@ -31,15 +40,37 @@ export const registerUser = createAsyncThunk(
 export const loginUser = createAsyncThunk(
   "user/loginUser",
   async (user, thunkAPI) => {
-    try {
-      const resp = await customFetch.post("/auth/login", user);
-      return resp.data;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data.msg);
-    }
+    return loginUserThunk("/auth/login", user, thunkAPI);
+
+    // try {
+    //   const resp = await customFetch.post("/auth/login", user);
+    //   return resp.data;
+    // } catch (error) {
+    //   return thunkAPI.rejectWithValue(error.response.data.msg);
+    // }
   }
 );
 
+// ? Update User Function ////////////
+export const updateUser = createAsyncThunk(
+  "user/updateUser",
+  async (user, thunkAPI) => {
+    return updateUserThunk("/auth/updateUser", user, thunkAPI);
+    // try {
+    //   const resp = await customFetch.patch("/auth/updateUser", user, {
+    //     headers: {
+    //       authorization: `Bearer ${thunkAPI.getState().user.user.token}`,
+    //     },
+    //   });
+    //   return resp.data;
+    // } catch (error) {
+    //   console.log(error.response);
+    //   return thunkAPI.rejectWithValue(error.response.data.msg);
+    // }
+  }
+);
+
+//// TODO::  CREATE SLICE ///////////////////////////
 const userSlice = createSlice({
   name: "user",
   initialState: initialState,
@@ -61,7 +92,7 @@ const userSlice = createSlice({
   },
 
   extraReducers: {
-    //*  Register
+    //*  Register   /////////////////////////////
     [registerUser.pending]: (state) => {
       state.isLoading = true;
     },
@@ -80,7 +111,7 @@ const userSlice = createSlice({
       toast.error(payload);
     },
 
-    //*  Login
+    //*  Login  /////////////////////////////
     [loginUser.pending]: (state) => {
       state.isLoading = true;
     },
@@ -95,6 +126,25 @@ const userSlice = createSlice({
     },
 
     [loginUser.rejected]: (state, { payload }) => {
+      state.isLoading = false;
+      toast.error(payload);
+    },
+
+    //*  Update  /////////////////////////////
+    [updateUser.pending]: (state) => {
+      state.isLoading = true;
+    },
+
+    [updateUser.fulfilled]: (state, { payload }) => {
+      const { user } = payload;
+      state.isLoading = false;
+      state.user = user;
+      addUserToLocalStorage(user);
+
+      toast.success("User Updated");
+    },
+
+    [updateUser.rejected]: (state, { payload }) => {
       state.isLoading = false;
       toast.error(payload);
     },
